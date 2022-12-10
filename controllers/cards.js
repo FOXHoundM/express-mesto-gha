@@ -1,6 +1,18 @@
 const Card = require('../models/card');
+const {
+  STATUS_CREATED,
+  STATUS_BAD_REQUEST,
+  BAD_REQUEST_MESSAGE,
+  STATUS_ERROR,
+  ERROR_MESSAGE,
+  STATUS_SUCCESS,
+  DELETE_MESSAGE,
+  STATUS_NOT_FOUND,
+  NOT_FOUND_MESSAGE,
+} = require('../errors/errors');
 
 module.exports.createCard = (req, res) => {
+  // eslint-disable-next-line no-console
   console.log(req.user._id);// _id станет доступен
   const {
     name,
@@ -12,25 +24,25 @@ module.exports.createCard = (req, res) => {
     link,
     owner: ownerId,
   })
-    .then((card) => res.status(200)
+    .then((card) => res.status(STATUS_CREATED)
       .json(card))
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        res.status(400)
-          .json({ message: 'Переданы некорректные данные' });
+      if (err.name === 'CastError') {
+        res.status(STATUS_BAD_REQUEST)
+          .json({ message: BAD_REQUEST_MESSAGE });
       } else {
-        res.status(500)
-          .json({ message: err.message });
+        res.status(STATUS_ERROR)
+          .json({ message: ERROR_MESSAGE });
       }
     });
 };
 
 module.exports.getCards = (req, res) => {
   Card.find(req.query)
-    .then((cards) => res.status(200)
+    .then((cards) => res.status(STATUS_SUCCESS)
       .json(cards))
-    .catch((err) => res.status(500)
-      .json({ err: err.message }));
+    .catch(() => res.status(STATUS_SUCCESS)
+      .json({ message: ERROR_MESSAGE }));
 };
 
 module.exports.deleteCard = (req, res) => {
@@ -38,20 +50,20 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (card) {
-        res.status(200)
-          .json({ message: 'Card deleted successfully' });
+        res.status(STATUS_SUCCESS)
+          .json({ message: DELETE_MESSAGE });
       } else {
-        res.status(404)
-          .json({ message: 'Card not found' });
+        res.status(STATUS_NOT_FOUND)
+          .json({ message: NOT_FOUND_MESSAGE });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400)
-          .json({ message: 'Incorrect data entered' });
+        res.status(STATUS_NOT_FOUND)
+          .json({ message: NOT_FOUND_MESSAGE });
       } else {
-        res.status(500)
-          .json({ message: err.message });
+        res.status(STATUS_ERROR)
+          .json({ message: ERROR_MESSAGE });
       }
     });
 };
@@ -63,25 +75,24 @@ module.exports.putLikeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     {
       new: true,
-      runValidators: true,
     },
   )
     .then((card) => {
       if (card) {
-        res.status(200)
+        res.status(STATUS_SUCCESS)
           .json(card);
       } else {
-        res.status(404)
-          .json({ message: 'Card not found' });
+        res.status(STATUS_NOT_FOUND)
+          .json({ message: NOT_FOUND_MESSAGE });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400)
-          .json({ message: 'Incorrect data entered' });
+        res.status(STATUS_BAD_REQUEST)
+          .json({ message: BAD_REQUEST_MESSAGE });
       } else {
-        res.status(500)
-          .json({ message: err.message });
+        res.status(STATUS_ERROR)
+          .json({ message: ERROR_MESSAGE });
       }
     });
 };
@@ -93,25 +104,24 @@ module.exports.putDislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     {
       new: true,
-      runValidators: true,
     },
   )
     .then((card) => {
       if (card) {
-        res.status(200)
+        res.status(STATUS_SUCCESS)
           .json(card);
       } else {
-        res.status(404)
-          .json({ message: 'Card not found' });
+        res.status(STATUS_NOT_FOUND)
+          .json({ message: NOT_FOUND_MESSAGE });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400)
-          .json({ message: 'Incorrect data entered' });
+        res.status(STATUS_BAD_REQUEST)
+          .json({ message: BAD_REQUEST_MESSAGE });
       } else {
-        res.status(500)
-          .json({ message: err.message });
+        res.status(STATUS_ERROR)
+          .json({ message: ERROR_MESSAGE });
       }
     });
 };
