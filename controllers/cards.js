@@ -27,7 +27,7 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(STATUS_CREATED)
       .json(card))
     .catch((err) => {
-      if (err.name === 'CastError') {
+      if (err.name === 'ValidationError') {
         res.status(STATUS_BAD_REQUEST)
           .json({ message: BAD_REQUEST_MESSAGE });
       } else {
