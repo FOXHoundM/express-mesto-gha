@@ -59,8 +59,8 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(STATUS_NOT_FOUND)
-          .json({ message: NOT_FOUND_MESSAGE });
+        res.status(STATUS_BAD_REQUEST)
+          .json({ message: BAD_REQUEST_MESSAGE });
       } else {
         res.status(STATUS_ERROR)
           .json({ message: ERROR_MESSAGE });
