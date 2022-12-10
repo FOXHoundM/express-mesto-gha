@@ -12,7 +12,6 @@ const {
 } = require('../errors/errors');
 
 module.exports.createCard = (req, res) => {
-  // eslint-disable-next-line no-console
   console.log(req.user._id);// _id станет доступен
   const {
     name,
