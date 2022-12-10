@@ -4,7 +4,6 @@ const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const { STATUS_BAD_REQUEST } = require('./errors/errors');
 
-
 const { PORT = 3000 } = process.env;
 
 const app = express();
@@ -28,7 +27,5 @@ app.use('*', (req, res) => res.status(STATUS_BAD_REQUEST)
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
 }, () => {
-  app.listen(PORT, () => {
-    console.log(`App listening on port ${PORT}`);
-  });
+  app.listen(PORT);
 });
