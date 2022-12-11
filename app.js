@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const { STATUS_NOT_FOUND, NOT_FOUND_MESSAGE } = require('./errors/errors');
+const { STATUS_NOT_FOUND } = require('./errors/errors');
 
 const { PORT = 3000 } = process.env;
 
@@ -22,7 +22,7 @@ app.use((req, res, next) => {
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 app.use('*', (req, res) => res.status(STATUS_NOT_FOUND)
-  .json({ message: NOT_FOUND_MESSAGE }));
+  .json({ message: 'Произошла ошибка, передан некорректный путь' }));
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
   useNewUrlParser: true,
