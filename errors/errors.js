@@ -1,6 +1,9 @@
 const STATUS_SUCCESS = 200;
 const STATUS_CREATED = 201;
 const STATUS_BAD_REQUEST = 400;
+const STATUS_UNAUTHORIZED = 401;
+const STATUS_FORBIDDEN = 403;
+const STATUS_CONFLICT = 409;
 const STATUS_NOT_FOUND = 404;
 const STATUS_ERROR = 500;
 
@@ -8,6 +11,8 @@ const BAD_REQUEST_MESSAGE = 'Incorrect data entered';
 const NOT_FOUND_MESSAGE = 'Resource not found';
 const ERROR_MESSAGE = 'An unexpected error has occurred';
 const DELETE_MESSAGE = 'Deleted';
+const UNAUTHORIZED_MESSAGE = ' Incorrect email or password';
+const FORBIDDEN_MESSAGE = 'Доступ запрещен';
 
 module.exports = {
   STATUS_SUCCESS,
@@ -15,6 +20,11 @@ module.exports = {
   STATUS_ERROR,
   STATUS_BAD_REQUEST,
   STATUS_NOT_FOUND,
+  STATUS_UNAUTHORIZED,
+  STATUS_CONFLICT,
+  STATUS_FORBIDDEN,
+  FORBIDDEN_MESSAGE,
+  UNAUTHORIZED_MESSAGE,
   BAD_REQUEST_MESSAGE,
   NOT_FOUND_MESSAGE,
   ERROR_MESSAGE,
