@@ -1,15 +1,7 @@
 const Card = require('../models/card');
-const {
-  STATUS_CREATED,
-  STATUS_BAD_REQUEST,
-  BAD_REQUEST_MESSAGE,
-  STATUS_ERROR,
-  ERROR_MESSAGE,
-  STATUS_SUCCESS,
-  DELETE_MESSAGE,
-  STATUS_NOT_FOUND,
-  NOT_FOUND_MESSAGE,
-} = require('../errors/errors');
+const BadRequestError = require('../errors/badRequestError');
+const { InternalServerError } = require('../errors/serverError');
+const NotFoundError = require('../errors/notFoundError');
 
 module.exports.createCard = (req, res) => {
   const {
@@ -22,25 +14,25 @@ module.exports.createCard = (req, res) => {
     link,
     owner: ownerId,
   })
-    .then((card) => res.status(STATUS_CREATED)
+    .then((card) => res.status(201)
       .json(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        res.status(InternalServerError)
+          .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
 };
 
 module.exports.getCards = (req, res) => {
   Card.find(req.query)
-    .then((cards) => res.status(STATUS_SUCCESS)
+    .then((cards) => res.status(200)
       .json(cards))
-    .catch(() => res.status(STATUS_SUCCESS)
-      .json({ message: ERROR_MESSAGE }));
+    .catch(() => res.status(InternalServerError)
+      .json({ message: 'Произошла ошибка загрузки данных' }));
 };
 
 module.exports.deleteCard = (req, res) => {
@@ -48,20 +40,22 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (card) {
-        res.status(STATUS_SUCCESS)
-          .json({ message: DELETE_MESSAGE });
+        res.status(200)
+          .json({ message: 'Успешно удален' });
       } else {
-        res.status(STATUS_NOT_FOUND)
-          .json({ message: NOT_FOUND_MESSAGE });
+        res.status(NotFoundError)
+          .json({
+            message: 'Карточка не найдена',
+          });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        res.status(InternalServerError)
+          .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
 };
@@ -77,20 +71,22 @@ module.exports.putLikeCard = (req, res) => {
   )
     .then((card) => {
       if (card) {
-        res.status(STATUS_SUCCESS)
+        res.status(200)
           .json(card);
       } else {
-        res.status(STATUS_NOT_FOUND)
-          .json({ message: NOT_FOUND_MESSAGE });
+        res.status(NotFoundError)
+          .json({
+            message: 'Resource not found',
+          });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        res.status(InternalServerError)
+          .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
 };
@@ -106,20 +102,22 @@ module.exports.putDislikeCard = (req, res) => {
   )
     .then((card) => {
       if (card) {
-        res.status(STATUS_SUCCESS)
+        res.status(200)
           .json(card);
       } else {
-        res.status(STATUS_NOT_FOUND)
-          .json({ message: NOT_FOUND_MESSAGE });
+        res.status(NotFoundError)
+          .json({
+            message: 'Resource not found',
+          });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        res.status(InternalServerError)
+          .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
 };

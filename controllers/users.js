@@ -1,22 +1,19 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const {
-  STATUS_ERROR,
-  ERROR_MESSAGE,
-} = require('../errors/errors');
 const { generateToken } = require('../helpers/token');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
 const NotFoundError = require('../errors/notFoundError');
 const UnauthorizedError = require('../errors/unauthorizedError');
+const { InternalServerError } = require('../errors/serverError');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200)
       .json(users))
     .catch(() => {
-      res.status(STATUS_ERROR)
-        .json({ message: ERROR_MESSAGE });
+      res.status(InternalServerError)
+        .json({ message: 'Произошла ошибка загрузки данных' });
     });
 };
 
@@ -67,7 +64,7 @@ module.exports.login = async (req, res, next) => {
           maxAge: 3600000 * 24,
           httpOnly: true,
         })
-        .json({ message: 'Вход выполнен успешно' });
+        .json({ token });
     }
     res.status(UnauthorizedError)
       .json({ message: 'Неправильные почта или пароль' });
@@ -143,8 +140,8 @@ module.exports.updateUser = (req, res) => {
         res.status(BadRequestError)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        res.status(InternalServerError)
+          .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
 };
@@ -171,8 +168,8 @@ module.exports.changeAvatar = (req, res) => {
         res.status(BadRequestError)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        res.status(InternalServerError)
+          .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
 };

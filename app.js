@@ -2,12 +2,12 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const { auth } = require('./middlewares/auth');
-const { STATUS_NOT_FOUND } = require('./errors/errors');
+const auth = require('./middlewares/auth');
 const {
   login,
   createUser,
 } = require('./controllers/users');
+const NotFoundError = require('./errors/notFoundError');
 
 const { PORT = 3000 } = process.env;
 
@@ -19,11 +19,10 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use('/users', userRouter);
+app.use('/users', auth, userRouter);
 app.use('/cards', cardRouter);
-app.use(auth);
 
-app.use('*', (req, res) => res.status(STATUS_NOT_FOUND)
+app.use('*', (req, res) => res.status(NotFoundError)
   .json({ message: 'Произошла ошибка, передан некорректный путь' }));
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {
