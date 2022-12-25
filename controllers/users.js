@@ -1,9 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const {
-  STATUS_SUCCESS,
   STATUS_ERROR,
-  NOT_FOUND_MESSAGE,
   ERROR_MESSAGE,
 } = require('../errors/errors');
 const { generateToken } = require('../helpers/token');
@@ -30,12 +28,14 @@ module.exports.getUserById = (req, res, next) => {
         res.status(200)
           .json(user);
       } else {
-        next(new NotFoundError('Resource not found'));
+        res.status(NotFoundError)
+          .json({ message: 'Resource not found' });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Неправильные данные введены'));
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
         next(err);
       }
