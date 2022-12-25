@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const auth = require('./middlewares/auth');
+const { auth } = require('./middlewares/auth');
 const { STATUS_NOT_FOUND } = require('./errors/errors');
 const {
   login,

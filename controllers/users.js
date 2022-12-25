@@ -3,34 +3,23 @@ const User = require('../models/user');
 const {
   STATUS_SUCCESS,
   STATUS_ERROR,
-  STATUS_NOT_FOUND,
   NOT_FOUND_MESSAGE,
-  STATUS_BAD_REQUEST,
-  BAD_REQUEST_MESSAGE,
   ERROR_MESSAGE,
-  STATUS_CREATED,
-  STATUS_UNAUTHORIZED,
-  UNAUTHORIZED_MESSAGE,
 } = require('../errors/errors');
 const { generateToken } = require('../helpers/token');
 const BadRequestError = require('../errors/badRequestError');
 const ConflictError = require('../errors/conflictError');
 const NotFoundError = require('../errors/notFoundError');
+const UnauthorizedError = require('../errors/unauthorizedError');
 
-// module.exports.getUsers = (req, res) => {
-//   User.find({})
-//     .then((users) => res.status(STATUS_SUCCESS)
-//       .json(users))
-//     .catch(() => {
-//       res.status(STATUS_ERROR)
-//         .json({ message: ERROR_MESSAGE });
-//     });
-// };
-
-module.exports.getUsers = (req, res, next) => {
+module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send(users))
-    .catch(next);
+    .then((users) => res.status(200)
+      .json(users))
+    .catch(() => {
+      res.status(STATUS_ERROR)
+        .json({ message: ERROR_MESSAGE });
+    });
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -38,7 +27,7 @@ module.exports.getUserById = (req, res, next) => {
   User.findById(userId)
     .then((user) => {
       if (user) {
-        res.status(STATUS_SUCCESS)
+        res.status(200)
           .json(user);
       } else {
         next(new NotFoundError('Resource not found'));
@@ -53,27 +42,38 @@ module.exports.getUserById = (req, res, next) => {
     });
 };
 
-module.exports.login = (req, res) => {
-  const {
-    email,
-    password,
-  } = req.body;
+module.exports.login = async (req, res, next) => {
+  try {
+    const {
+      email,
+      password,
+    } = req.body;
+    const user = await User.findOne({ email })
+      .select('+password');
 
-  return User.findUserByCredentials(
-    email,
-    password,
-  )
-    .then((user) => {
+    if (!user) {
+      res.status(UnauthorizedError)
+        .json({ message: 'Неправильные почта или пароль' });
+    }
+
+    const result = await bcrypt.compare(password, user.password);
+
+    if (result) {
       const payload = { _id: user._id };
       const token = generateToken(payload);
 
-      return res.status(STATUS_SUCCESS)
-        .json({ token });
-    })
-    .catch(() => {
-      res.status(STATUS_UNAUTHORIZED)
-        .json({ message: UNAUTHORIZED_MESSAGE });
-    });
+      res.status(200)
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24,
+          httpOnly: true,
+        })
+        .json({ message: 'Вход выполнен успешно' });
+    }
+    res.status(UnauthorizedError)
+      .json({ message: 'Неправильные почта или пароль' });
+  } catch (err) {
+    next(err);
+  }
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -93,22 +93,24 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(STATUS_CREATED)
+    .then((user) => res.status(201)
       .json({
+        _id: user._id,
+        email: user.email,
         name: user.name,
         about: user.about,
         avatar: user.avatar,
-        email: user.email,
-        _id: user._id,
       }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Неправильные данные введены'));
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       }
       if (err.code === 11000) {
-        return next(new ConflictError(`Данный ${email} уже существует`));
+        res.status(ConflictError)
+          .json({ message: `Данный ${email} уже существует` });
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -127,19 +129,19 @@ module.exports.updateUser = (req, res) => {
   })
     .then((user) => {
       if (user) {
-        res.status(STATUS_SUCCESS)
+        res.status(200)
           .json(user);
       } else {
-        res.status(STATUS_NOT_FOUND)
+        res.status(NotFoundError)
           .json({
-            message: NOT_FOUND_MESSAGE,
+            message: 'Resource not found',
           });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
         res.status(STATUS_ERROR)
           .json({ message: ERROR_MESSAGE });
@@ -155,19 +157,19 @@ module.exports.changeAvatar = (req, res) => {
   })
     .then((user) => {
       if (user) {
-        res.status(STATUS_SUCCESS)
+        res.status(200)
           .json(user);
       } else {
-        res.status(STATUS_NOT_FOUND)
+        res.status(NotFoundError)
           .json({
-            message: NOT_FOUND_MESSAGE,
+            message: 'Resource not found',
           });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
         res.status(STATUS_ERROR)
           .json({ message: ERROR_MESSAGE });
