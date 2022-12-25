@@ -104,13 +104,7 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => res.status(201)
-      .json({
-        _id: user._id,
-        email: user.email,
-        name: user.name,
-        about: user.about,
-        avatar: user.avatar,
-      }))
+      .json(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(BadRequestError)
