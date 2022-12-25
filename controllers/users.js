@@ -14,14 +14,20 @@ const {
 } = require('../errors/errors');
 const { generateToken } = require('../helpers/token');
 
-module.exports.getUsers = (req, res) => {
+// module.exports.getUsers = (req, res) => {
+//   User.find({})
+//     .then((users) => res.status(STATUS_SUCCESS)
+//       .json(users))
+//     .catch(() => {
+//       res.status(STATUS_ERROR)
+//         .json({ message: ERROR_MESSAGE });
+//     });
+// };
+
+module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(STATUS_SUCCESS)
-      .json(users))
-    .catch(() => {
-      res.status(STATUS_ERROR)
-        .json({ message: ERROR_MESSAGE });
-    });
+    .then((users) => res.send(users))
+    .catch(next);
 };
 
 module.exports.getUserById = (req, res) => {
