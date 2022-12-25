@@ -13,6 +13,9 @@ const {
   UNAUTHORIZED_MESSAGE,
 } = require('../errors/errors');
 const { generateToken } = require('../helpers/token');
+const BadRequestError = require('../errors/badRequestError');
+const ConflictError = require('../errors/conflictError');
+const NotFoundError = require('../errors/notFoundError');
 
 // module.exports.getUsers = (req, res) => {
 //   User.find({})
@@ -30,7 +33,7 @@ module.exports.getUsers = (req, res, next) => {
     .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
@@ -38,17 +41,14 @@ module.exports.getUserById = (req, res) => {
         res.status(STATUS_SUCCESS)
           .json(user);
       } else {
-        res.status(STATUS_NOT_FOUND)
-          .json({ message: NOT_FOUND_MESSAGE });
+        next(new NotFoundError('Resource not found'));
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        next(new BadRequestError('Неправильные данные введены'));
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        next(err);
       }
     });
 };
@@ -76,7 +76,7 @@ module.exports.login = (req, res) => {
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -94,19 +94,21 @@ module.exports.createUser = (req, res) => {
       password: hash,
     }))
     .then((user) => res.status(STATUS_CREATED)
-      .json(user))
+      .json({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+        _id: user._id,
+      }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        return next(new BadRequestError('Неправильные данные введены'));
       }
       if (err.code === 11000) {
-        res.status(409)
-          .json({ message: `Данный ${email} уже существует` });
-      } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        return next(new ConflictError(`Данный ${email} уже существует`));
       }
+      return next(err);
     });
 };
 
