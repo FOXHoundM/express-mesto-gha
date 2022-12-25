@@ -39,6 +39,19 @@ module.exports.getUserById = (req, res, next) => {
     });
 };
 
+module.exports.getUserInfo = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (!user) {
+        res.status(NotFoundError)
+          .json({ message: 'Пользователь с данным ID не найден' });
+      }
+      res.status(201)
+        .json(user);
+    })
+    .catch(next);
+};
+
 module.exports.login = async (req, res, next) => {
   try {
     const {

@@ -19,7 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use('/users', auth, userRouter);
+app.use(auth);
+app.use('/users', userRouter);
 app.use('/cards', cardRouter);
 
 app.use('*', (req, res) => res.status(NotFoundError)
