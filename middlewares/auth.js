@@ -4,7 +4,7 @@ const Unauthorized = require('../errors/unauthorizedError');
 const { secretKey } = require('../helpers/token');
 
 module.exports = (req, res, next) => {
-  const { authorization } = req.headers.authorization;
+  const { authorization } = req.headers;
   if (!authorization) {
     next(new Unauthorized('Необходима авторизация.'));
   } else {
