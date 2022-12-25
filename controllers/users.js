@@ -93,6 +93,10 @@ module.exports.createUser = (req, res) => {
       if (err.name === 'ValidationError') {
         res.status(STATUS_BAD_REQUEST)
           .json({ message: BAD_REQUEST_MESSAGE });
+      }
+      if (err.code === 11000) {
+        res.status(409)
+          .json({ message: `Данный ${email} уже существует` });
       } else {
         res.status(STATUS_ERROR)
           .json({ message: ERROR_MESSAGE });
