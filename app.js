@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
-const { auth } = require('./middlewares/auth');
+const auth = require('./middlewares/auth');
 const { STATUS_NOT_FOUND } = require('./errors/errors');
 const {
   login,
@@ -19,9 +19,9 @@ app.use(express.urlencoded({ extended: false }));
 app.post('/signin', login);
 app.post('/signup', createUser);
 
-app.use(auth);
 app.use('/users', userRouter);
 app.use('/cards', cardRouter);
+app.use(auth);
 
 app.use('*', (req, res) => res.status(STATUS_NOT_FOUND)
   .json({ message: 'Произошла ошибка, передан некорректный путь' }));

@@ -1,5 +1,4 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const {
   STATUS_SUCCESS,
@@ -10,7 +9,10 @@ const {
   BAD_REQUEST_MESSAGE,
   ERROR_MESSAGE,
   STATUS_CREATED,
+  STATUS_UNAUTHORIZED,
+  UNAUTHORIZED_MESSAGE,
 } = require('../errors/errors');
+const { generateToken } = require('../helpers/token');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -51,18 +53,20 @@ module.exports.login = (req, res) => {
     password,
   } = req.body;
 
-  return User.findUserByCredentials({
+  return User.findUserByCredentials(
     email,
     password,
-  })
+  )
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      res.status(STATUS_SUCCESS)
+      const payload = { _id: user._id };
+      const token = generateToken(payload);
+
+      return res.status(STATUS_SUCCESS)
         .json({ token });
     })
     .catch(() => {
-      res.status(STATUS_ERROR)
-        .json({ message: ERROR_MESSAGE });
+      res.status(STATUS_UNAUTHORIZED)
+        .json({ message: UNAUTHORIZED_MESSAGE });
     });
 };
 
