@@ -1,72 +1,92 @@
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const {
-  STATUS_SUCCESS,
-  STATUS_ERROR,
-  STATUS_NOT_FOUND,
-  NOT_FOUND_MESSAGE,
-  STATUS_BAD_REQUEST,
-  BAD_REQUEST_MESSAGE,
-  ERROR_MESSAGE,
-  STATUS_CREATED,
-} = require('../errors/errors');
+const { generateToken } = require('../helpers/token');
+const BadRequestError = require('../errors/badRequestError');
+const ConflictError = require('../errors/conflictError');
+const NotFoundError = require('../errors/notFoundError');
+const UnauthorizedError = require('../errors/unauthorizedError');
+const { InternalServerError } = require('../errors/serverError');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(STATUS_SUCCESS)
+    .then((users) => res.status(200)
       .json(users))
     .catch(() => {
-      res.status(STATUS_ERROR)
-        .json({ message: ERROR_MESSAGE });
+      res.status(InternalServerError)
+        .json({ message: 'Произошла ошибка загрузки данных' });
     });
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
   User.findById(userId)
     .then((user) => {
       if (user) {
-        res.status(STATUS_SUCCESS)
+        res.status(200)
           .json(user);
       } else {
-        res.status(STATUS_NOT_FOUND)
-          .json({ message: NOT_FOUND_MESSAGE });
+        res.status(NotFoundError)
+          .json({ message: 'Resource not found' });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        next(err);
       }
     });
 };
 
-module.exports.login = (req, res) => {
-  const {
-    email,
-    password,
-  } = req.body;
-
-  return User.findUserByCredentials({
-    email,
-    password,
-  })
+module.exports.getUserInfo = (req, res, next) => {
+  User.findById(req.user._id)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      res.status(STATUS_SUCCESS)
-        .json({ token });
+      if (!user) {
+        res.status(NotFoundError)
+          .json({ message: 'Пользователь с данным ID не найден' });
+      }
+      res.status(201)
+        .json(user);
     })
-    .catch(() => {
-      res.status(STATUS_ERROR)
-        .json({ message: ERROR_MESSAGE });
-    });
+    .catch(next);
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.login = async (req, res, next) => {
+  try {
+    const {
+      email,
+      password,
+    } = req.body;
+    const user = await User.findOne({ email })
+      .select('+password');
+
+    if (!user) {
+      res.status(UnauthorizedError)
+        .json({ message: 'Неправильные почта или пароль' });
+    }
+
+    const result = await bcrypt.compare(password, user.password);
+
+    if (result) {
+      const payload = { _id: user._id };
+      const token = generateToken(payload);
+
+      res.status(200)
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24,
+          httpOnly: true,
+        })
+        .json({ token });
+    }
+    res.status(UnauthorizedError)
+      .json({ message: 'Неправильные почта или пароль' });
+  } catch (err) {
+    next(err);
+  }
+};
+
+module.exports.createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -83,16 +103,24 @@ module.exports.createUser = (req, res) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(STATUS_CREATED)
-      .json(user))
+    .then((user) => res.status(201)
+      .json({
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
-      } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       }
+      if (err.code === 11000) {
+        res.status(ConflictError)
+          .json({ message: `Данный ${email} уже существует` });
+      }
+      next(err);
     });
 };
 
@@ -111,22 +139,22 @@ module.exports.updateUser = (req, res) => {
   })
     .then((user) => {
       if (user) {
-        res.status(STATUS_SUCCESS)
+        res.status(200)
           .json(user);
       } else {
-        res.status(STATUS_NOT_FOUND)
+        res.status(NotFoundError)
           .json({
-            message: NOT_FOUND_MESSAGE,
+            message: 'Resource not found',
           });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        res.status(InternalServerError)
+          .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
 };
@@ -139,22 +167,22 @@ module.exports.changeAvatar = (req, res) => {
   })
     .then((user) => {
       if (user) {
-        res.status(STATUS_SUCCESS)
+        res.status(200)
           .json(user);
       } else {
-        res.status(STATUS_NOT_FOUND)
+        res.status(NotFoundError)
           .json({
-            message: NOT_FOUND_MESSAGE,
+            message: 'Resource not found',
           });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(STATUS_BAD_REQUEST)
-          .json({ message: BAD_REQUEST_MESSAGE });
+        res.status(BadRequestError)
+          .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(STATUS_ERROR)
-          .json({ message: ERROR_MESSAGE });
+        res.status(InternalServerError)
+          .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
 };
