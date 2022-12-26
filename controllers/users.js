@@ -3,6 +3,8 @@ const User = require('../models/user');
 const { generateToken } = require('../helpers/token');
 const { InternalServerError } = require('../errors/serverError');
 const UnauthorizedError = require('../errors/unauthorizedError');
+const BadRequestError = require('../errors/badRequestError');
+const ConflictError = require('../errors/conflictError');
 
 module.exports.getUsers = async (req, res, next) => {
   try {
@@ -103,14 +105,12 @@ module.exports.createUser = (req, res, next) => {
       .json(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400)
-          .json({ message: 'Неправильные данные введены' });
+        return next(new BadRequestError('Неправильные данные введены'));
       }
       if (err.code === 11000) {
-        res.status(409)
-          .json({ message: `Данный ${email} уже существует` });
+        return next(new ConflictError(`Данный ${email} уже существует`));
       }
-      next(err);
+      return next(err);
     });
 };
 
