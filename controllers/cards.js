@@ -18,10 +18,10 @@ module.exports.createCard = (req, res) => {
       .json(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BadRequestError)
+        res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(InternalServerError)
+        res.status(500)
           .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
@@ -31,7 +31,7 @@ module.exports.getCards = (req, res) => {
   Card.find(req.query)
     .then((cards) => res.status(200)
       .json(cards))
-    .catch(() => res.status(InternalServerError)
+    .catch(() => res.status(500)
       .json({ message: 'Произошла ошибка загрузки данных' }));
 };
 
@@ -43,7 +43,7 @@ module.exports.deleteCard = (req, res) => {
         res.status(200)
           .json({ message: 'Успешно удален' });
       } else {
-        res.status(NotFoundError)
+        res.status(404)
           .json({
             message: 'Карточка не найдена',
           });
@@ -51,10 +51,10 @@ module.exports.deleteCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BadRequestError)
+        res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(InternalServerError)
+        res.status(500)
           .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
@@ -74,7 +74,7 @@ module.exports.putLikeCard = (req, res) => {
         res.status(200)
           .json(card);
       } else {
-        res.status(NotFoundError)
+        res.status(404)
           .json({
             message: 'Resource not found',
           });
@@ -82,10 +82,10 @@ module.exports.putLikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BadRequestError)
+        res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(InternalServerError)
+        res.status(500)
           .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });

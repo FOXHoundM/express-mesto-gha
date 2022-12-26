@@ -7,7 +7,6 @@ const {
   login,
   createUser,
 } = require('./controllers/users');
-const NotFoundError = require('./errors/notFoundError');
 
 const { PORT = 3000 } = process.env;
 
@@ -22,7 +21,7 @@ app.post('/signup', createUser);
 app.use('/users', auth, userRouter);
 app.use('/cards', cardRouter);
 
-app.use('*', (req, res) => res.status(NotFoundError)
+app.use('*', (req, res) => res.status(404)
   .json({ message: 'Произошла ошибка, передан некорректный путь' }));
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb', {

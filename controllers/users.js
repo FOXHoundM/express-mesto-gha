@@ -1,20 +1,18 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const { generateToken } = require('../helpers/token');
-const BadRequestError = require('../errors/badRequestError');
-const ConflictError = require('../errors/conflictError');
-const NotFoundError = require('../errors/notFoundError');
-const UnauthorizedError = require('../errors/unauthorizedError');
 const { InternalServerError } = require('../errors/serverError');
+const UnauthorizedError = require('../errors/unauthorizedError');
 
-module.exports.getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(200)
-      .json(users))
-    .catch(() => {
-      res.status(InternalServerError)
-        .json({ message: 'Произошла ошибка загрузки данных' });
-    });
+module.exports.getUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({})
+      .orFail(() => new Error('Пользователи не найдены'));
+    return res.status(200)
+      .json(users);
+  } catch (err) {
+    return next(new InternalServerError('Произошла ошибка загрузки данных о пользователях'));
+  }
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -25,13 +23,13 @@ module.exports.getUserById = (req, res, next) => {
         res.status(200)
           .json(user);
       } else {
-        res.status(NotFoundError)
+        res.status(404)
           .json({ message: 'Resource not found' });
       }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BadRequestError)
+        res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
         next(err);
@@ -43,7 +41,7 @@ module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        res.status(NotFoundError)
+        res.status(404)
           .json({ message: 'Пользователь с данным ID не найден' });
       }
       res.status(201)
@@ -62,8 +60,7 @@ module.exports.login = async (req, res, next) => {
       .select('+password');
 
     if (!user) {
-      res.status(UnauthorizedError)
-        .json({ message: 'Неправильные почта или пароль' });
+      throw new UnauthorizedError('Неправильные почта или пароль');
     }
 
     const result = await bcrypt.compare(password, user.password);
@@ -72,17 +69,16 @@ module.exports.login = async (req, res, next) => {
       const payload = { _id: user._id };
       const token = generateToken(payload);
 
-      res.status(200)
+      return res.status(200)
         .cookie('jwt', token, {
           maxAge: 3600000 * 24,
           httpOnly: true,
         })
-        .json({ token });
+        .json({ message: 'Вход выполнен успешно' });
     }
-    res.status(UnauthorizedError)
-      .json({ message: 'Неправильные почта или пароль' });
+    throw new UnauthorizedError('Неправильные почта или пароль');
   } catch (err) {
-    next(err);
+    return next(err);
   }
 };
 
@@ -107,11 +103,11 @@ module.exports.createUser = (req, res, next) => {
       .json(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BadRequestError)
+        res.status(400)
           .json({ message: 'Неправильные данные введены' });
       }
       if (err.code === 11000) {
-        res.status(ConflictError)
+        res.status(409)
           .json({ message: `Данный ${email} уже существует` });
       }
       next(err);
@@ -136,7 +132,7 @@ module.exports.updateUser = (req, res) => {
         res.status(200)
           .json(user);
       } else {
-        res.status(NotFoundError)
+        res.status(404)
           .json({
             message: 'Resource not found',
           });
@@ -144,10 +140,10 @@ module.exports.updateUser = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(BadRequestError)
+        res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(InternalServerError)
+        res.status(500)
           .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
@@ -164,7 +160,7 @@ module.exports.changeAvatar = (req, res) => {
         res.status(200)
           .json(user);
       } else {
-        res.status(NotFoundError)
+        res.status(404)
           .json({
             message: 'Resource not found',
           });
@@ -172,10 +168,10 @@ module.exports.changeAvatar = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
-        res.status(BadRequestError)
+        res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(InternalServerError)
+        res.status(500)
           .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
