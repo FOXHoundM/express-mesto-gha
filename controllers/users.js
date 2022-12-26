@@ -105,14 +105,14 @@ module.exports.createUser = (req, res, next) => {
       .json(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(BadRequestError)
+        return res.status(400)
           .json({ message: 'Неправильные данные введены' });
       }
       if (err.code === 11000) {
-        res.status(ConflictError)
+        return res.status(409)
           .json({ message: `Данный ${email} уже существует` });
       }
-      next(err);
+      return next(err);
     });
 };
 
