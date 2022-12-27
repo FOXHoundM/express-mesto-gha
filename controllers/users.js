@@ -3,8 +3,6 @@ const User = require('../models/user');
 const { generateToken } = require('../helpers/token');
 const { InternalServerError } = require('../errors/serverError');
 const UnauthorizedError = require('../errors/unauthorizedError');
-const BadRequestError = require('../errors/badRequestError');
-const ConflictError = require('../errors/conflictError');
 
 module.exports.getUsers = async (req, res, next) => {
   try {
@@ -46,7 +44,7 @@ module.exports.getUserInfo = (req, res, next) => {
         res.status(404)
           .json({ message: 'Пользователь с данным ID не найден' });
       }
-      res.status(201)
+      res.status(200)
         .json(user);
     })
     .catch(next);
@@ -62,7 +60,9 @@ module.exports.login = async (req, res, next) => {
       .select('+password');
 
     if (!user) {
-      throw new UnauthorizedError('Неправильные почта или пароль');
+      return res.status(401)
+        .json({ message: 'Неправильные почта или пароль' });
+      // throw new UnauthorizedError('Неправильные почта или пароль');
     }
 
     const result = await bcrypt.compare(password, user.password);
