@@ -41,13 +41,19 @@ module.exports.getUserInfo = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        res.status(404)
+        return res.status(404)
           .json({ message: 'Пользователь с данным ID не найден' });
       }
-      res.status(200)
+      return res.status(200)
         .json(user);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CaseError') {
+        return res.status(400)
+          .json({ message: 'Неправильные данные введены' });
+      }
+      return next(err);
+    });
 };
 
 module.exports.login = async (req, res, next) => {
@@ -60,7 +66,7 @@ module.exports.login = async (req, res, next) => {
       .select('+password');
 
     if (!user) {
-      return res.status(401)
+      return res.status(400)
         .json({ message: 'Неправильные почта или пароль' });
       // throw new UnauthorizedError('Неправильные почта или пароль');
     }
@@ -71,14 +77,11 @@ module.exports.login = async (req, res, next) => {
       const payload = { _id: user._id };
       const token = generateToken(payload);
 
+      console.log(token);
       return res.status(200)
-        .cookie('jwt', token, {
-          maxAge: 3600000 * 24,
-          httpOnly: true,
-        })
-        .json({ message: 'Вход выполнен успешно' });
+        .json({ token });
     }
-    throw new UnauthorizedError('Неправильные почта или пароль');
+    return next(new UnauthorizedError('Неправильные почта или пароль'));
   } catch (err) {
     return next(err);
   }
