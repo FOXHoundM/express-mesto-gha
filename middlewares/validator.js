@@ -1,5 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
-const isURL = require('validator/es/lib/isURL');
+const validator = require('validator');
 
 module.exports.validateLogin = celebrate({
   body: Joi.object().keys({
@@ -20,7 +20,7 @@ module.exports.validateAvatarUpdate = celebrate({
     avatar: Joi.string()
       .required()
       .custom((value) => {
-        if (!isURL(value)) {
+        if (!validator.isURL(value)) {
           throw new Error('Ошибка валидации. Введите правильный URL');
         }
         return value;
@@ -41,7 +41,7 @@ module.exports.validateCardCreation = celebrate({
     link: Joi.string()
       .required()
       .custom((value) => {
-        if (!isURL(value)) {
+        if (!validator.isURL(value)) {
           throw new Error('Ошибка валидации. Введите правильный URL');
         }
         return value;
