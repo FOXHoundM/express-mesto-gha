@@ -1,7 +1,4 @@
 const Card = require('../models/card');
-const BadRequestError = require('../errors/badRequestError');
-const { InternalServerError } = require('../errors/serverError');
-const NotFoundError = require('../errors/notFoundError');
 
 module.exports.createCard = (req, res) => {
   const {
@@ -37,6 +34,7 @@ module.exports.getCards = (req, res) => {
 
 module.exports.deleteCard = (req, res) => {
   const { cardId } = req.params;
+  const { userId } = req.user._id;
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (card) {
@@ -47,6 +45,14 @@ module.exports.deleteCard = (req, res) => {
           .json({
             message: 'Карточка не найдена',
           });
+      }
+    })
+    .then((card) => {
+      if (card.owner.valueOf() === userId) {
+        card.remove();
+      } else {
+        res.status(403)
+          .json({ message: 'Доступ запрещен' });
       }
     })
     .catch((err) => {
@@ -105,7 +111,7 @@ module.exports.putDislikeCard = (req, res) => {
         res.status(200)
           .json(card);
       } else {
-        res.status(NotFoundError)
+        res.status(404)
           .json({
             message: 'Resource not found',
           });
@@ -113,10 +119,10 @@ module.exports.putDislikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(BadRequestError)
+        res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(InternalServerError)
+        res.status(500)
           .json({ message: 'Произошла ошибка загрузки данных' });
       }
     });
