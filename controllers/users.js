@@ -66,7 +66,7 @@ module.exports.login = async (req, res, next) => {
       .select('+password');
 
     if (!user) {
-      return res.status(400)
+      return res.status(401)
         .json({ message: 'Неправильные почта или пароль' });
       // throw new UnauthorizedError('Неправильные почта или пароль');
     }
