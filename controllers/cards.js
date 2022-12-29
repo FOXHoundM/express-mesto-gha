@@ -49,14 +49,9 @@ module.exports.deleteCard = (req, res, next) => {
       }
     });
   Card.findByIdAndRemove(cardId)
-    .then((card) => {
-      if (card) {
+    .then(() => {
         res.status(200)
           .json({ message: 'Успешно удален' });
-      } else {
-        res.status(404)
-          .json({ message: 'Карточка не найдена' });
-      }
     })
     .catch((err) => {
       if (err.name === 'CastError') {
