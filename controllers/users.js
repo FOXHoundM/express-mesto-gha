@@ -54,7 +54,7 @@ module.exports.getUserInfo = async (req, res, next) => {
     // return res.status(200).json(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      res.status(400).json({message: 'Неправильные данные введены' })
+      res.status(400).json({ message: 'Неправильные данные введены' });
       // return next(new BadRequestError('Неправильные данные введены'));
     }
     next(err);
@@ -71,8 +71,10 @@ module.exports.login = async (req, res, next) => {
       .select('+password');
 
     if (!user) {
-      res.status(400).json({message: 'Неправильные почта или пароль'})
+      res.status(401).json({ message: 'Неправильные почта или пароль' });
       // return (new UnauthorizedError('Неправильные почта или пароль'));
+    } else {
+      res.status(400).json({ message: 'Неправильные данные введены' })
     }
 
     const result = await bcrypt.compare(password, user.password);
@@ -81,12 +83,11 @@ module.exports.login = async (req, res, next) => {
       const payload = { _id: user._id };
       const token = generateToken(payload);
 
-      console.log(token);
-      return res.status(200)
+      res.status(200)
         .json({ token });
-    } else {
-      res.status(401).json({message: 'Неправильные почта или пароль'})
     }
+    res.status(401).json({ message: 'Неправильные почта или пароль' });
+
     // return next(new UnauthorizedError('Неправильные почта или пароль'));
   } catch (err) {
     next(err);
@@ -120,11 +121,11 @@ module.exports.createUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400).json({message: 'Неправильные данные введены'})
+        res.status(400).json({ message: 'Неправильные данные введены' });
         // return next(new BadRequestError('Неправильные данные введены'));
       }
       if (err.code === 11000) {
-        res.status(409).json({ message: `Данный ${email} уже существует` })
+        res.status(409).json({ message: `Данный ${email} уже существует` });
         // return next(new ConflictError(`Данный ${email} уже существует`));
       }
       next(err);
