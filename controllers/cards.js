@@ -18,7 +18,7 @@ module.exports.createCard = (req, res, next) => {
         res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        next(err)
+        next(err);
       }
     });
 };
@@ -29,7 +29,7 @@ module.exports.getCards = (req, res, next) => {
       .json(cards))
     .catch((err) => {
       next(err);
-    })
+    });
 };
 
 module.exports.deleteCard = (req, res) => {

@@ -8,8 +8,8 @@ module.exports.getUsers = (req, res, next) => {
       res.status(200).json(users);
     })
     .catch((err) => {
-      next(err)
-    })
+      next(err);
+    });
 };
 
 module.exports.getUserById = (req, res, next) => {
