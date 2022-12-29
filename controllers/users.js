@@ -2,10 +2,10 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const { generateToken } = require('../helpers/token');
 const { InternalServerError } = require('../errors/serverError');
-const UnauthorizedError = require('../errors/unauthorizedError');
-const BadRequestError = require('../errors/badRequestError');
-const ConflictError = require('../errors/conflictError');
-const NotFoundError = require('../errors/notFoundError');
+// const UnauthorizedError = require('../errors/unauthorizedError');
+// const BadRequestError = require('../errors/badRequestError');
+// const ConflictError = require('../errors/conflictError');
+// const NotFoundError = require('../errors/notFoundError');
 
 module.exports.getUsers = async (req, res, next) => {
   try {
@@ -48,7 +48,7 @@ module.exports.getUserInfo = async (req, res, next) => {
     if (!user) {
       res.status(404).json({ message: 'User not found' });
       // return next(new NotFoundError('Пользователь не найден'));
-    } else{
+    } else {
       res.status(200).json(user);
     }
     // return res.status(200).json(user);
@@ -71,7 +71,8 @@ module.exports.login = async (req, res, next) => {
       .select('+password');
 
     if (!user) {
-      return (new UnauthorizedError('Неправильные почта или пароль'));
+      res.status(401).json({message: 'Неправильные почта или пароль'})
+      // return (new UnauthorizedError('Неправильные почта или пароль'));
     }
 
     const result = await bcrypt.compare(password, user.password);
@@ -83,10 +84,12 @@ module.exports.login = async (req, res, next) => {
       console.log(token);
       return res.status(200)
         .json({ token });
+    } else {
+      res.status(401).json({message: 'Неправильные почта или пароль'})
     }
-    return next(new UnauthorizedError('Неправильные почта или пароль'));
+    // return next(new UnauthorizedError('Неправильные почта или пароль'));
   } catch (err) {
-    return next(err);
+    next(err);
   }
 };
 
@@ -117,12 +120,14 @@ module.exports.createUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Неправильные данные введены'));
+        res.status(400).json({message: 'Неправильные данные введены'})
+        // return next(new BadRequestError('Неправильные данные введены'));
       }
       if (err.code === 11000) {
-        return next(new ConflictError(`Данный ${email} уже существует`));
+        res.status(409).json({ message: `Данный ${email} уже существует` })
+        // return next(new ConflictError(`Данный ${email} уже существует`));
       }
-      return next(err);
+      next(err);
     });
 };
 
