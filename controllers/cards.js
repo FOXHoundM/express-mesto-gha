@@ -32,8 +32,22 @@ module.exports.getCards = (req, res, next) => {
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   const { cardId } = req.params;
+  const userId = req.user._id;
+  Card.findById({ _id: cardId })
+    .then((card) => {
+      if (!card) {
+        res.status(404)
+          .json({
+            message: 'Карточка не найдена',
+          });
+      }
+      if (!card.owner.equals(userId)) {
+        res.status(403)
+          .json({ message: 'Доступ запрещен' });
+      }
+    });
   Card.findByIdAndRemove(cardId)
     .then((card) => {
       if (card) {
@@ -41,9 +55,7 @@ module.exports.deleteCard = (req, res) => {
           .json({ message: 'Успешно удален' });
       } else {
         res.status(404)
-          .json({
-            message: 'Карточка не найдена',
-          });
+          .json({ message: 'Карточка не найдена' });
       }
     })
     .catch((err) => {
@@ -51,8 +63,7 @@ module.exports.deleteCard = (req, res) => {
         res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(500)
-          .json({ message: 'Произошла ошибка загрузки данных' });
+        next(err);
       }
     });
 };
