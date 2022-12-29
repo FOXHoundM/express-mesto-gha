@@ -86,7 +86,10 @@ module.exports.login = async (req, res, next) => {
       res.status(200)
         .json({ token });
     }
-    res.status(401).json({ message: 'Неправильные почта или пароль' });
+    else {
+      res.status(400).json({ message: 'Неправильные данные введены' })
+    }
+    // res.status(401).json({ message: 'Неправильные почта или пароль' });
 
     // return next(new UnauthorizedError('Неправильные почта или пароль'));
   } catch (err) {
