@@ -1,6 +1,6 @@
 const Card = require('../models/card');
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const {
     name,
     link,
@@ -14,22 +14,22 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(201)
       .json(card))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         res.status(400)
           .json({ message: 'Неправильные данные введены' });
       } else {
-        res.status(500)
-          .json({ message: 'Произошла ошибка загрузки данных' });
+        next(err)
       }
     });
 };
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find(req.query)
     .then((cards) => res.status(200)
       .json(cards))
-    .catch(() => res.status(500)
-      .json({ message: 'Произошла ошибка загрузки данных' }));
+    .catch((err) => {
+      next(err);
+    })
 };
 
 module.exports.deleteCard = (req, res) => {

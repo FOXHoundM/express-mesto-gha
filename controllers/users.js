@@ -1,26 +1,15 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const { generateToken } = require('../helpers/token');
-const { InternalServerError } = require('../errors/serverError');
-// const UnauthorizedError = require('../errors/unauthorizedError');
-// const BadRequestError = require('../errors/badRequestError');
-// const ConflictError = require('../errors/conflictError');
-// const NotFoundError = require('../errors/notFoundError');
 
-module.exports.getUsers = async (req, res, next) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => {
       res.status(200).json(users);
     })
-    .catch(next)
-  // try {
-  //   const users = await User.find({})
-  //     .orFail(() => new Error('Пользователи не найдены'));
-  //   return res.status(200)
-  //     .json(users);
-  // } catch (err) {
-  //   return next(new InternalServerError('Произошла ошибка загрузки данных о пользователях'));
-  // }
+    .catch((err) => {
+      next(err)
+    })
 };
 
 module.exports.getUserById = (req, res, next) => {
