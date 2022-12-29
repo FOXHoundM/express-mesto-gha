@@ -40,23 +40,26 @@ module.exports.getUserById = (req, res, next) => {
     });
 };
 
-
 module.exports.getUserInfo = async (req, res, next) => {
   try {
     const userId = req.user._id;
     const user = await User.findById(userId);
 
     if (!user) {
-      return next(new NotFoundError('Пользователь не найден'))
+      res.status(404).json({ message: 'User not found' });
+      // return next(new NotFoundError('Пользователь не найден'));
+    } else{
+      res.status(200).json(user);
     }
-    return  res.status(200).json(user)
+    // return res.status(200).json(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      return next(new BadRequestError('Неправильные данные введены'));
+      res.status(400).json({message: 'Неправильные данные введены' })
+      // return next(new BadRequestError('Неправильные данные введены'));
     }
-    return next(err);
+    next(err);
   }
-}
+};
 
 module.exports.login = async (req, res, next) => {
   try {
@@ -114,10 +117,10 @@ module.exports.createUser = (req, res, next) => {
       }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return next(new BadRequestError('Неправильные данные введены'))
+        return next(new BadRequestError('Неправильные данные введены'));
       }
       if (err.code === 11000) {
-        return next(new ConflictError(`Данный ${email} уже существует`))
+        return next(new ConflictError(`Данный ${email} уже существует`));
       }
       return next(err);
     });
