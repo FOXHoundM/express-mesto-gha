@@ -8,14 +8,19 @@ const { InternalServerError } = require('../errors/serverError');
 // const NotFoundError = require('../errors/notFoundError');
 
 module.exports.getUsers = async (req, res, next) => {
-  try {
-    const users = await User.find({})
-      .orFail(() => new Error('Пользователи не найдены'));
-    return res.status(200)
-      .json(users);
-  } catch (err) {
-    return next(new InternalServerError('Произошла ошибка загрузки данных о пользователях'));
-  }
+  User.find({})
+    .then((users) => {
+      res.status(200).json(users);
+    })
+    .catch(next)
+  // try {
+  //   const users = await User.find({})
+  //     .orFail(() => new Error('Пользователи не найдены'));
+  //   return res.status(200)
+  //     .json(users);
+  // } catch (err) {
+  //   return next(new InternalServerError('Произошла ошибка загрузки данных о пользователях'));
+  // }
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -72,9 +77,6 @@ module.exports.login = async (req, res, next) => {
 
     if (!user) {
       res.status(401).json({ message: 'Неправильные почта или пароль' });
-      // return (new UnauthorizedError('Неправильные почта или пароль'));
-    } else {
-      res.status(400).json({ message: 'Неправильные данные введены' })
     }
 
     const result = await bcrypt.compare(password, user.password);
@@ -85,13 +87,9 @@ module.exports.login = async (req, res, next) => {
 
       res.status(200)
         .json({ token });
+    } else {
+      res.status(401).json({ message: 'Неправильные почта или пароль' });
     }
-    else {
-      res.status(400).json({ message: 'Неправильные данные введены' })
-    }
-    // res.status(401).json({ message: 'Неправильные почта или пароль' });
-
-    // return next(new UnauthorizedError('Неправильные почта или пароль'));
   } catch (err) {
     next(err);
   }
