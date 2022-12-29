@@ -50,8 +50,8 @@ module.exports.deleteCard = (req, res, next) => {
     });
   Card.findByIdAndRemove(cardId)
     .then(() => {
-        res.status(200)
-          .json({ message: 'Успешно удален' });
+      res.status(200)
+        .json({ message: 'Успешно удален' });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
