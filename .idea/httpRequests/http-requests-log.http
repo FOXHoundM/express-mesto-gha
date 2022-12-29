@@ -1,0 +1,261 @@
+POST http://localhost:3000/signup
+Accept: application/json
+Content-Type: application/json
+Content-Length: 190
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Mika",
+  "about": "father",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "password123456"
+
+}
+
+<> 2022-12-29T160722.409.html
+
+###
+
+POST http://localhost:3000/signup
+Accept: application/json
+Content-Type: application/json
+Content-Length: 190
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Mika",
+  "about": "father",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "password123456"
+
+}
+
+<> 2022-12-29T160321.409.html
+
+###
+
+GET http://localhost:3000/users
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2022-12-28T222138.401.json
+
+###
+
+POST http://localhost:3000/signin
+Authorization:
+Content-Length: 0
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2022-12-28T222129.401.json
+
+###
+
+POST http://localhost:3000/signin
+Authorization: Bearer
+Content-Length: 0
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2022-12-28T222123.401.json
+
+###
+
+POST http://localhost:3000/signin
+Authorization: Bearer
+Content-Length: 0
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2022-12-28T222051.401.json
+
+###
+
+GET http://localhost:3000/users/me
+Accept: application/json
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2022-12-28T222047.401.json
+
+###
+
+POST http://localhost:3000/signup
+Accept: application/json
+Content-Type: application/json
+Content-Length: 190
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Mika",
+  "about": "father",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "password123456"
+
+}
+
+<> 2022-12-28T221837.409.json
+
+###
+
+POST http://localhost:3000/signin
+Authorization: Bearer
+Content-Length: 0
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2022-12-28T221808.401.json
+
+###
+
+POST http://localhost:3000/signin
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 0
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+<> 2022-12-28T221742.401.json
+
+###
+
+POST http://localhost:3000/signup
+Accept: application/json
+Content-Type: application/json
+Content-Length: 190
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Mika",
+  "about": "father",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "password123456"
+
+}
+
+<> 2022-12-28T221650.201.json
+
+###
+
+POST http://localhost:3000/signup
+Accept: application/json
+Content-Type: application/json
+Content-Length: 190
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Mika",
+  "about": "father",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "password123456"
+
+}
+
+<> 2022-12-28T221526.500.html
+
+###
+
+POST http://localhost:3000/signup
+Accept: application/json
+Content-Type: application/json
+Content-Length: 185
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Mika",
+  "about": "father",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "123456789"
+
+}
+
+<> 2022-12-28T221501.500.html
+
+###
+
+POST http://localhost:3000/signup
+Content-Type: application/json
+Content-Length: 185
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Mika",
+  "about": "father",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "123456789"
+
+}
+
+<> 2022-12-28T221446.500.html
+
+###
+
+POST http://localhost:3000/signup
+Content-Type: application/json
+Content-Length: 180
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Mika",
+  "about": "father",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "1234"
+
+}
+
+<> 2022-12-28T221247.500.html
+
+###
+
+POST http://localhost:3000/signup
+Content-Type: application/json
+Content-Length: 180
+Connection: Keep-Alive
+User-Agent: Apache-HttpClient/4.5.13 (Java/17.0.5)
+Accept-Encoding: br,deflate,gzip,x-gzip
+
+{
+  "name": "Mika",
+  "about": "father",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "1234"
+
+}
+
+<> 2022-12-28T221156.500.html
+
+###
+

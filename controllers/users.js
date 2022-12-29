@@ -3,6 +3,9 @@ const User = require('../models/user');
 const { generateToken } = require('../helpers/token');
 const { InternalServerError } = require('../errors/serverError');
 const UnauthorizedError = require('../errors/unauthorizedError');
+const BadRequestError = require('../errors/badRequestError');
+const ConflictError = require('../errors/conflictError');
+const NotFoundError = require('../errors/notFoundError');
 
 module.exports.getUsers = async (req, res, next) => {
   try {
@@ -37,24 +40,23 @@ module.exports.getUserById = (req, res, next) => {
     });
 };
 
-module.exports.getUserInfo = (req, res, next) => {
-  User.findById(req.user._id)
-    .then((user) => {
-      if (!user) {
-        return res.status(404)
-          .json({ message: 'Пользователь с данным ID не найден' });
-      }
-      return res.status(200)
-        .json(user);
-    })
-    .catch((err) => {
-      if (err.name === 'CaseError') {
-        return res.status(400)
-          .json({ message: 'Неправильные данные введены' });
-      }
-      return next(err);
-    });
-};
+
+module.exports.getUserInfo = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(new NotFoundError('Пользователь не найден'))
+    }
+    return  res.status(200).json(user)
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return next(new BadRequestError('Неправильные данные введены'));
+    }
+    return next(err);
+  }
+}
 
 module.exports.login = async (req, res, next) => {
   try {
@@ -66,9 +68,7 @@ module.exports.login = async (req, res, next) => {
       .select('+password');
 
     if (!user) {
-      return res.status(401)
-        .json({ message: 'Неправильные почта или пароль' });
-      // throw new UnauthorizedError('Неправильные почта или пароль');
+      return (new UnauthorizedError('Неправильные почта или пароль'));
     }
 
     const result = await bcrypt.compare(password, user.password);
@@ -105,15 +105,19 @@ module.exports.createUser = (req, res, next) => {
       password: hash,
     }))
     .then((user) => res.status(201)
-      .json(user))
+      .json({
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+      }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400)
-          .json({ message: 'Неправильные данные введены' });
+        return next(new BadRequestError('Неправильные данные введены'))
       }
       if (err.code === 11000) {
-        return res.status(409)
-          .json({ message: `Данный ${email} уже существует` });
+        return next(new ConflictError(`Данный ${email} уже существует`))
       }
       return next(err);
     });
