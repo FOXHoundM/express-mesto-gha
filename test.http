@@ -1,0 +1,25 @@
+POST http://localhost:3000/signin
+Accept: application/json
+Content-Type: application/json
+
+{
+  "email": "421@ya.ru",
+  "password": "1234567890"
+}
+################################
+
+GET http://localhost:3000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2FlZGMwZmE2ZGZjZjY5M2UwMTdiYTQiLCJpYXQiOjE2NzI0MDM5OTUsImV4cCI6MTY3MzAwODc5NX0.4CBORaBMU1PXTqylRuHakyUgzImWrk6xQvcjve2HA7I
+
+################################
+
+POST http://localhost:3000/signup
+Content-Type: application/json
+
+{
+  "name": "Mika",
+  "about": "mika",
+  "avatar": "https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png",
+  "email": "4216623@ya.ru",
+  "password": "1234567890"
+}

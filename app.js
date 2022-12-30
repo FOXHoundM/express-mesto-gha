@@ -7,6 +7,7 @@ const {
   login,
   createUser,
 } = require('./controllers/users');
+const { signIn } = require('./middlewares/validator');
 
 const { PORT = 3000 } = process.env;
 
@@ -15,7 +16,7 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/signin', login);
+app.post('/signin', signIn, login);
 app.post('/signup', createUser);
 
 app.use('/users', auth, userRouter);

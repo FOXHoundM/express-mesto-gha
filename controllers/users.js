@@ -41,15 +41,12 @@ module.exports.getUserInfo = async (req, res, next) => {
 
     if (!user) {
       res.status(404).json({ message: 'User not found' });
-      // return next(new NotFoundError('Пользователь не найден'));
     } else {
       res.status(200).json(user);
     }
-    // return res.status(200).json(user);
   } catch (err) {
     if (err.name === 'CastError') {
       res.status(400).json({ message: 'Неправильные данные введены' });
-      // return next(new BadRequestError('Неправильные данные введены'));
     }
     next(err);
   }
@@ -112,11 +109,9 @@ module.exports.createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(400).json({ message: 'Неправильные данные введены' });
-        // return next(new BadRequestError('Неправильные данные введены'));
       }
       if (err.code === 11000) {
         res.status(409).json({ message: `Данный ${email} уже существует` });
-        // return next(new ConflictError(`Данный ${email} уже существует`));
       }
       next(err);
     });
