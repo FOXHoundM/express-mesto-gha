@@ -46,12 +46,14 @@ module.exports.deleteCard = (req, res, next) => {
           });
       }
       if (userId === card.owner.toString()) {
-        res.status(200).json({ message: 'deleted' });
+        card.remove();
       } else {
         res.status(403).json({ message: 'Доступ запрещен' });
       }
     })
-    .catch(next);
+    .catch((err) => {
+      next(err);
+    });
 
   Card.findByIdAndRemove(cardId)
     .then(() => {
