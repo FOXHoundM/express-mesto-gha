@@ -36,11 +36,11 @@ module.exports.deleteCard = (req, res, next) => {
   const userId = req.user._id;
 
   Card.findById({ _id: req.params.cardId })
-    .then((data) => {
-      if (!data) {
+    .then((card) => {
+      if (!card) {
         res.status(404).json({ message: 'Невозможно найти' });
       }
-      if (!data.owner.equals(userId)) {
+      if (!card.owner.equals(userId)) {
         res.status(403).json({ message: 'Невозможно удалить' });
       }
       Card.findByIdAndDelete({ _id: req.params.cardId })
