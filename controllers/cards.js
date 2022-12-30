@@ -34,14 +34,20 @@ module.exports.getCards = (req, res, next) => {
 
 module.exports.deleteCard = (req, res, next) => {
   const cardRemove = () => {
-    Card.findByIdAndDelete(req.params.cardId)
+    Card.findByIdAndRemove(req.params.cardId)
       .then((card) => {
         if (!card) {
           res.status(404).json({ message: 'Карточка с указанным _id не найдена.' });
         }
-        res.status(200).send({ message: 'Карточка удалена' });
+        res.status(200).json({ message: 'Карточка удалена' });
       })
-      .catch(next);
+      .catch((err) => {
+        if (err.name === 'CastError') {
+          res.status(400).json({ message: 'Неправильные введены данные' });
+        } else {
+          next(err);
+        }
+      });
   };
 
   Card.findById(req.params.cardId)
