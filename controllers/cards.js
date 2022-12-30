@@ -33,41 +33,28 @@ module.exports.getCards = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  const { cardId } = req.params;
+  const cardRemove = () => {
+    Card.findByIdAndDelete(req.params.cardId)
+      .then((card) => {
+        if (!card) {
+          res.status(404).json({ message: 'Карточка с указанным _id не найдена.' });
+        }
+        res.status(200).send({ message: 'Карточка удалена' });
+      })
+      .catch(next);
+  };
 
-  const userId = req.user._id;
-
-  Card.findById({ _id: cardId })
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (!card) {
-        res.status(404)
-          .json({
-            message: 'Карточка не найдена',
-          });
-      }
-      if (userId === card.owner.toString()) {
-        card.remove();
+        res.status(404).json({ message: 'Передан несуществующий _id карточки.' });
+      } if (req.user._id === card.owner.toString()) {
+        cardRemove();
       } else {
-        res.status(403).json({ message: 'Доступ запрещен' });
+        res.status(403).json({ message: 'Карточка не содержит указанный идентификатор пользователя.' });
       }
     })
-    .catch((err) => {
-      next(err);
-    });
-
-  Card.findByIdAndRemove(cardId)
-    .then(() => {
-      res.status(200)
-        .json({ message: 'Успешно удален' });
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400)
-          .json({ message: 'Неправильные данные введены' });
-      } else {
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 module.exports.putLikeCard = (req, res) => {
