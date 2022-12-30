@@ -33,34 +33,28 @@ module.exports.getCards = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  const cardRemove = () => {
-    Card.findByIdAndDelete(req.params.cardId)
-      .then((card) => {
-        if (!card) {
-          res.status(404).json({ message: 'Карточка с указанным _id не найдена.' });
-        }
-      })
-      .catch((err) => {
-        if (err.name === 'CastError') {
-          res.status(400).json({ message: 'Неправильные введены данные' });
-        } else {
-          next(err);
-        }
-      });
-  };
+  const userId = req.user._id;
 
-  Card.findById(req.params.cardId)
-    .then((card) => {
-      if (!card) {
-        res.status(404).json({ message: 'Передан несуществующий _id карточки.' });
-      } if (card.owner.valueOf() === req.user._id) {
-        cardRemove();
-      } else {
-        res.status(403).json({ message: 'Карточка не содержит указанный идентификатор пользователя.' });
+  Card.findById({ _id: req.params.cardId })
+    .then((data) => {
+      if (!data) {
+        res.status(404).json({ message: 'Невозможно найти' });
       }
-      res.status(200).json({ message: 'Карточка удалена' });
+      if (!data.owner.equals(userId)) {
+        res.status(403).json({ message: 'Невозможно удалить' });
+      }
+      Card.findByIdAndDelete({ _id: req.params.cardId })
+        .then(() => {
+          res.status(200).json({ message: 'Deleted' });
+        }).catch(next);
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400).json({ message: 'Введены некорректные данные' });
+      } else {
+        next(err);
+      }
+    });
 };
 
 module.exports.putLikeCard = (req, res) => {
