@@ -54,7 +54,7 @@ module.exports.deleteCard = (req, res, next) => {
     .then((card) => {
       if (!card) {
         res.status(404).json({ message: 'Передан несуществующий _id карточки.' });
-      } if (req.user._id === card.owner.toString()) {
+      } if (req.user._id === card.owner.valueOf()) {
         cardRemove();
       } else {
         res.status(403).json({ message: 'Карточка не содержит указанный идентификатор пользователя.' });
