@@ -114,8 +114,9 @@ module.exports.createUser = (req, res, next) => {
       }
       if (err.code === 11000) {
         res.status(409).json({ message: `Данный ${email} уже существует` });
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
