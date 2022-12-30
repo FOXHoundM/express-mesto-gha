@@ -92,6 +92,9 @@ module.exports.createUser = (req, res, next) => {
     password,
   } = req.body;
 
+  if (!email || !password) {
+    res.status(400).json({ message: 'Invalid credentials' });
+  }
   bcrypt.hash(password, 10)
     .then((hash) => User.create({
       name,
