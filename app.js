@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const { errors } = require('celebrate');
+const { errors, celebrate, Joi } = require('celebrate');
 const userRouter = require('./routes/users');
 const cardRouter = require('./routes/cards');
 const auth = require('./middlewares/auth');
@@ -9,10 +9,7 @@ const {
   createUser,
 } = require('./controllers/users');
 const { errorHandler } = require('./helpers/errorHandler');
-const {
-  validateSignIn,
-  validateSignUp,
-} = require('./middlewares/validator');
+const { isUrlValid } = require('./helpers/isUrlValid');
 
 const { PORT = 3000 } = process.env;
 
@@ -21,8 +18,21 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.post('/signin', validateSignIn, login);
-app.post('/signup', validateSignUp, createUser);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), login);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string().custom(isUrlValid),
+  }),
+}), createUser);
 
 app.use('/users', auth, userRouter);
 app.use('/cards', auth, cardRouter);
