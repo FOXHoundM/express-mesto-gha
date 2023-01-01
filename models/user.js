@@ -11,9 +11,8 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
       validate: {
-        validator(value) {
-          return validator.isEmail(value);
-        },
+        validator: (email) => validator.isEmail(email),
+        message: 'Введенный Вами адрес электронной почты не соответствует необходимому формату.',
       },
     },
     password: {
@@ -36,10 +35,8 @@ const userSchema = new Schema(
     avatar: {
       type: String,
       validate: {
-        validator(url) {
-          return validator.isURL(url);
-        },
-        message: 'URL validation error',
+        validator: (link) => validator.isURL(link),
+        message: 'Введенная ссылка не соответствует необходимому формату.',
       },
       default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     },
