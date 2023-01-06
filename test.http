@@ -6,6 +6,7 @@ Content-Type: application/json
   "email": "test",
   "password": "longPass"
 }
+
 ################################
 
 GET http://localhost:3000/users
@@ -13,11 +14,10 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2M2FlZGMwZ
 
 ################################
 
-POST http://localhost:3000/signup
+POST https://foxhound.nomoredomains.club:3000/signup
 Content-Type: application/json
 
 {
-  │     "email": "Nicholas.Schuster88@hotmail.com",
-  │     "about": "about",
-  │     "avatar": "https://ya.ru/av.bmp"
-  │ }
+  "email": "test@mikael.test",
+  "password": "password12345678"
+}
