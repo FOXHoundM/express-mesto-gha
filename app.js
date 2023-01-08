@@ -26,10 +26,10 @@ const app = express();
 
 const allowedCors = [
   'http://localhost:3000',
-  'http://ageidar.nomoredomains.club',
-  'https://ageidar.nomoredomains.club',
-  'http://api.ageidar.nomoredomains.club',
-  'https://api.ageidar.nomoredomains.club',
+  'http://foxhound.nomoredomains.club',
+  'https://foxhound.nomoredomains.club',
+  'http://api.foxhound.nomoredomains.club',
+  'https://api.foxhound.nomoredomains.club',
 ];
 
 const corsOptions = {
@@ -46,6 +46,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(requestLogger);
+
+// app.get('/crash-test', () => {
+//   setTimeout(() => {
+//     throw new Error('Сервер сейчас упадёт');
+//   }, 0);
+// });
 
 app.post('/signin', celebrate({
   body: Joi.object()
