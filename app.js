@@ -28,8 +28,6 @@ const allowedCors = [
   'http://localhost:3000',
   'http://foxhound.nomoredomains.club',
   'https://foxhound.nomoredomains.club',
-  'http://api.foxhound.nomoredomains.club',
-  'https://api.foxhound.nomoredomains.club',
 ];
 
 const corsOptions = {
